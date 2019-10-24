@@ -22,12 +22,25 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 dotfiles_dir="dotfiles"
 default_profile_name="default"
 secrets_profile_name="secrets"
+track_filename=".track"
 target_directory="$HOME"
 debug="false"
+
+dotfiles_dir_abs="$SCRIPT_DIR/$dotfiles_dir"
+track_file_abs="$SCRIPT_DIR/$track_filename"
+untrack_file_abs="$SCRIPT_DIR/.untrack"
 
 logd() {
     local msg="$1"
     test "$debug" = "true" && echo "$msg"
+}
+
+track_file() {
+    local file_to_track="$1"
+    local track_filepath="$SCRIPT_DIR/$track_filename"
+    if ! grep $file_to_track $track_filepath >/dev/null; then
+        echo "$file_to_track" >> $track_filepath
+    fi
 }
 
 process_file() {
@@ -69,7 +82,41 @@ process_file() {
 
     echo -n "linking [$absolute_source_path] to [$target_filepath]... "
     ln -s $absolute_source_path $target_filepath
+    track_file $target_filepath
     echo "done."
+}
+
+process_deleted_files() {
+    local profile_dir="$1"
+
+    test -f "$untrack_file_abs" && rm -f "$untrack_file_abs"
+
+    for tracked_file in `cat $track_file_abs`; do
+        logd "processing tracked file [$tracked_file]"
+        local tracked_file_relative=`echo "$tracked_file" | sed "s_$target_directory/\.__"`
+        local found="false"
+        for directory in "$default_profile_name" "$secrets_profile_name" "$profile_dir"; do
+            test -z "$directory" && continue
+            local filepath="$dotfiles_dir_abs/$directory/$tracked_file_relative"
+            logd "checking if file [$filepath] exists"
+            if [ -f "$filepath" ]; then
+                logd "found [$filepath]"
+                found="true"
+                continue
+            fi
+        done
+        if [ "$found" = "false" ]; then
+            echo "deleting link [$tracked_file]"
+            rm -f "$tracked_file"
+            echo "$tracked_file" >> "$untrack_file_abs"
+        fi
+    done
+
+    if [ -f "$untrack_file_abs" ]; then
+        grep -vf "$untrack_file_abs" "$track_file_abs" > "$track_file_abs~"
+        mv "$track_file_abs~" "$track_file_abs"
+        rm -f "$untrack_file_abs"
+    fi
 }
 
 process_subdirectory() {
@@ -125,8 +172,8 @@ process_profile() {
 
 helpmsg() {
     echo "Usage: `basename $0` [-v] [link [profile_name] | git [git_arguments]]
-    
-    -v  -  activate verbose mode 
+
+    -v  -  activate verbose mode
     link  -  links dotfiles in default, secrets and, eventually, profile_name directories, in this order
     git [git_arguments]  -  runs git commands in the dotfiles directory
 "
@@ -161,6 +208,7 @@ elif [ "$command" = "link" ]; then
         test -d $profile && process_profile $profile
     fi
     cd - >/dev/null
+    process_deleted_files $profile
 
 else
     helpmsg

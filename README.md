@@ -51,6 +51,13 @@ A use case is when you have another pc/server and you need a slightly different 
 that translates in you need some dotfiles to have different content than the usual.
 
 
+### Tracking
+
+`dfl` tracks the links it creates, so it deletes them if they are not presents in your `dotfiles` directory anymore.
+
+It's clean, does not leave broken symlinks all around.
+
+
 ## Git
 
 You can commit and push your dotfiles directly with `dfl`!
