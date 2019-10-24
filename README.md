@@ -36,6 +36,9 @@ It will link `default`, then `secrets` and then the `fluxbox` directory, overrid
 
 This way of handle things is inspired by [bashdot](https://github.com/bashdot/bashdot) profiles.
 
+A use case is when you have another pc/server and you need a slightly different configuration,
+that translates in you need some dotfiles to have different content than the usual.
+
 
 ## Git
 
