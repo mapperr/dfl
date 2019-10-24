@@ -1,4 +1,4 @@
-A little dotfiles linker.
+A little dotfiles linker, inspired by [bashdot](https://github.com/bashdot/bashdot).
 
 It links your dotfiles to your HOME directory.
 
@@ -33,6 +33,8 @@ like this:
 `dfl link fluxbox`
 
 It will link `default`, then `secrets` and then the `fluxbox` directory, overriding existing links.
+
+This way of handle things is inspired by [bashdot](https://github.com/bashdot/bashdot).
 
 
 ## Git
