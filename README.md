@@ -27,7 +27,7 @@ If something that is not a link exists it will ask nicely what to do.
 
 ### Overrides
 
-If you need some 'overrides', put them in a new directory and pass it to the script as an argument,
+If you need some 'overrides', put them in a new directory, e.g. `dotfiles/fluxbox`, and pass it to the script as an argument,
 like this:
 
 `dfl link fluxbox`
