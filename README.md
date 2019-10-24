@@ -11,13 +11,11 @@ It, well, links your dotfiles to your HOME directory.
 
 Just clone this repo, `cd` in it and put your dotfiles in a `dfl/dotfiles/default` directory, without the dot.
 
-The `dotfiles` directory is gitignored, so you can even `git init` another repo in it.
-
-Or you can symlink your existing dotfiles folder as `/path/to/dfl/dotfiles`.
-
-So, to create links run:
+Then run:
 
 `dfl link`
+
+That's it.
 
 It works with directories too:
 
@@ -26,6 +24,10 @@ It works with directories too:
 If the path does not exits it will mkdir it for you.
 
 If something that is not a link exists it will ask nicely what to do.
+
+The `dotfiles` directory is gitignored, so you can even `git init` another repo in it.
+
+Or you can symlink your existing dotfiles folder as `/path/to/dfl/dotfiles`.
 
 
 ### Secrets
