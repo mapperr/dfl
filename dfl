@@ -125,12 +125,11 @@ process_profile() {
 }
 
 helpmsg() {
-    echo "Usage: `basename $0` [-v] [-h | --help | help | git <git_arguments> | profile_name]
+    echo "Usage: `basename $0` [-v] [link [profile_name] | git [git_arguments]]
     
     -v  -  activate verbose mode 
-    -h, --help, help  -  shows this help msg
-    git <git_arguments>  -  runs git commands in the dotfiles directory
-    profile_name  -  links dotfiles in default, secrets and profile_name directories, in this order
+    link  -  links dotfiles in default, secrets and, eventually, profile_name directories, in this order
+    git [git_arguments]  -  runs git commands in the dotfiles directory
 "
 }
 
@@ -145,19 +144,17 @@ if [ "$command" = "-v" ]; then
 fi
 
 
-if [ "$command" = "help" ]; then
-
-    helpmsg
-    
-elif [ "$command" = "git" ]; then
+if [ "$command" = "git" ]; then
 
     shift
     cd $SCRIPT_DIR/$dotfiles_dir > /dev/null
     git $@
     cd - >/dev/null
 
-else
+elif [ "$command" = "link" ]; then
 
+    shift
+    profile="$1"
     cd $SCRIPT_DIR/$dotfiles_dir > /dev/null
     test -d $default_profile_name && process_profile $default_profile_name
     test -d $secrets_profile_name && process_profile $secrets_profile_name
@@ -165,4 +162,8 @@ else
         test -d $profile && process_profile $profile
     fi
     cd - >/dev/null
+
+else
+    helpmsg
 fi
+
