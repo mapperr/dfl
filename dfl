@@ -97,7 +97,9 @@ process_deleted_files() {
         local found="false"
         for directory in "$default_profile_name" "$secrets_profile_name" "$profile_dir"; do
             test -z "$directory" && continue
-            local filepath="$dotfiles_dir_abs/$directory/$tracked_file_relative"
+            local directory_abs="$dotfiles_dir_abs/$directory"
+            test ! -d $directory_abs && continue
+            local filepath="$directory_abs/$tracked_file_relative"
             logd "checking if file [$filepath] exists"
             if [ -f "$filepath" ]; then
                 logd "found [$filepath]"
