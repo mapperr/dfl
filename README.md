@@ -34,7 +34,7 @@ like this:
 
 It will link `default`, then `secrets` and then the `fluxbox` directory, overriding existing links.
 
-This way of handle things is inspired by [bashdot](https://github.com/bashdot/bashdot).
+This way of handle things is inspired by [bashdot](https://github.com/bashdot/bashdot) profiles.
 
 
 ## Git
