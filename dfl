@@ -55,8 +55,7 @@ process_file() {
             if [ "$c" = "y" ]; then
                 mv $target_filepath $target_filepath~
                 if [ ! $? = 0 ]; then
-                    echo "WARNING: cannot backup [$target_filepath]"
-                    echo "I will not link it"
+                    echo "ERROR: cannot backup [$target_filepath], I will not link it"
                     return
                 fi
             else
