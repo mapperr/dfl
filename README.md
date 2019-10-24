@@ -1,16 +1,17 @@
-A little dotfiles linker, inspired by [bashdot](https://github.com/bashdot/bashdot).
+A little, dead simple dotfiles linker,
 
-It links your dotfiles to your HOME directory.
+inspired by [bashdot](https://github.com/bashdot/bashdot).
+
+It, well, links your dotfiles to your HOME directory.
 
 
 ## Dotfiles
 
-Just put your dotfiles in a `dotfiles/default` directory, without the dot.
+Just clone this repo, `cd` in it and put your dotfiles in a `dfl/dotfiles/default` directory, without the dot.
 
-The `dotfiles` directory is gitignored, so you can `init` another git repo in it.
+The `dotfiles` directory is gitignored, so you can even `git init` another repo in it.
 
-You can put your secret dotfiles in the `dotfiles/secrets` directory, they will be linked after the `default` ones,
-and, if `dotfiles` is a git repo, you can gitignore it.
+Or you can symlink your existing dotfiles folder as `/path/to/dfl/dotfiles`.
 
 So, to create links run:
 
@@ -23,6 +24,12 @@ It works with directories too:
 If the path does not exits it will mkdir it for you.
 
 If something that is not a link exists it will ask nicely what to do.
+
+
+### Secrets
+
+You can put your secret dotfiles in the `dotfiles/secrets` directory,
+they will be linked after the `default` ones, and, if `dotfiles` is a git repo, you can gitignore it.
 
 
 ### Overrides
