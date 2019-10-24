@@ -30,3 +30,15 @@ If something that is not a link exists it will ask nicely what to do.
 As for now, there no merging of default and overrides files:
 it seems a pain in the ass to me, with only a little gain.
 
+### Git
+
+You can commit and push your dotfiles directly with `dfl`!
+
+Just:
+
+`dfl git <whatever git command and arguments>`
+
+it `cd` in your `dotfiles` directory and execute the `git` part.
+
+Handy, isn't it? : )
+
