@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+# DotFiles Linker
+
+# requirements:
+# - readlink
+
+# optionals:
+# - git
+
+
+# https://stackoverflow.com/a/246128/1407614
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+
+dotfiles_dir="dotfiles"
+default_profile_name="default"
+secrets_profile_name="secrets"
+target_directory="$HOME"
+debug="false"
+
+logd() {
+    local msg="$1"
+    test "$debug" = "true" && echo "$msg"
+}
+
+process_file() {
+    local profile_name="$1"
+    local relative_filepath="$2"
+
+    local absolute_source_path="$SCRIPT_DIR/$dotfiles_dir/$profile_name/$relative_filepath"
+    local target_filepath="$target_directory/.$relative_filepath"
+    local target_dirname=`dirname $target_filepath`
+
+    if [ ! -d "$target_dirname" ]; then
+        logd "creating directory [$target_dirname]"
+        mkdir -p $target_dirname
+    fi
+
+    if [ -f "$target_filepath" ] || [ -L "$target_filepath" ]; then
+        logd "[$target_filepath] exists"
+        if readlink "$target_filepath" > /dev/null; then
+            logd "deleting existing link [$target_filepath]"
+            rm -f $target_filepath
+        else
+            echo "WARNING: [$target_filepath] is present and is not a link"
+            echo -n "do you want to replace it with a link? (I'll backup it as [$target_filepath~]) (y/n) "
+            read c
+            if [ "$c" = "y" ]; then
+                mv $target_filepath $target_filepath~
+                if [ ! $? = 0 ]; then
+                    echo "WARNING: cannot backup [$target_filepath]"
+                    echo "I will not link it"
+                    return
+                fi
+            else
+                echo "ok, I wont touch it"
+                return
+            fi
+        fi
+    else
+        logd "[$target_filepath] does not exists, I will link it"
+    fi
+
+    echo -n "linking [$absolute_source_path] to [$target_filepath]... "
+    ln -s $absolute_source_path $target_filepath
+    echo "done."
+}
+
+process_subdirectory() {
+    local profile_name="$1"
+    local directory="$2"
+
+    if [ -z "$directory" ]; then
+        echo "argument directory is blank" >&2
+        exit 1
+    fi
+
+    logd "processing subdirectory $directory"
+
+    local relative_path="$profile_name/$directory"
+
+    for item in `/bin/ls -A $relative_path`; do
+        local item_path="$relative_path/$item"
+        logd "processing item [$item_path]"
+
+        if [ -d "$item_path" ]; then
+            logd "$item is a directory"
+            process_subdirectory "$profile_name" "$directory/$item"
+        fi
+
+        if [ -f "$item_path" ]; then
+            process_file $profile_name $directory/$item
+        fi
+    done
+}
+
+process_profile() {
+    local profile_name="$1"
+
+    if [ -z "$profile_name" ]; then
+        echo "argument profile_name is blank" >&2
+        exit 1
+    fi
+
+    logd "processing directory $profile_name"
+
+    for item in `/bin/ls -A $profile_name`; do
+
+        if [ -d "$profile_name/$item" ]; then
+            logd "$item is a directory"
+            process_subdirectory "$profile_name" "$item"
+        fi
+
+        if [ -f "$profile_name/$item" ]; then
+            process_file $profile_name $item
+        fi
+    done
+}
+
+helpmsg() {
+    echo "Usage: `basename $0` [-v] [-h | --help | help | git <git_arguments> | profile_name]
+    
+    -v  -  activate verbose mode 
+    -h, --help, help  -  shows this help msg
+    git <git_arguments>  -  runs git commands in the dotfiles directory
+    profile_name  -  links dotfiles in default, secrets and profile_name directories, in this order
+"
+}
+
+# -------
+
+command="$1"
+
+if [ "$command" = "-v" ]; then
+    debug=true
+    shift
+    command="$1"
+fi
+
+
+if [ "$command" = "help" ]; then
+
+    helpmsg
+    
+elif [ "$command" = "git" ]; then
+
+    shift
+    cd $SCRIPT_DIR/$dotfiles_dir > /dev/null
+    git $@
+    cd - >/dev/null
+
+else
+
+    cd $SCRIPT_DIR/$dotfiles_dir > /dev/null
+    test -d $default_profile_name && process_profile $default_profile_name
+    test -d $secrets_profile_name && process_profile $secrets_profile_name
+    if [ ! -z "$profile" ]; then
+        test -d $profile && process_profile $profile
+    fi
+    cd - >/dev/null
+fi
