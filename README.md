@@ -1,3 +1,5 @@
+# The DotFiles Linker
+
 A little, dead simple dotfiles linker,
 
 inspired by [bashdot](https://github.com/bashdot/bashdot).
