@@ -26,9 +26,10 @@ track_filename=".track"
 target_directory="$HOME"
 debug="false"
 
-dotfiles_dir_abs="$SCRIPT_DIR/$dotfiles_dir"
-track_file_abs="$SCRIPT_DIR/$track_filename"
-untrack_file_abs="$SCRIPT_DIR/.untrack"
+dfl_user_dir_abs="$HOME/.dfl"
+dotfiles_dir_abs="$dfl_user_dir_abs/$dotfiles_dir"
+track_file_abs="$dfl_user_dir_abs/$track_filename"
+untrack_file_abs="$dfl_user_dir_abs/.untrack"
 
 backup_suffix="-dflbak"
 
@@ -39,9 +40,8 @@ logd() {
 
 track_file() {
     local file_to_track="$1"
-    local track_filepath="$SCRIPT_DIR/$track_filename"
-    if ! grep $file_to_track $track_filepath >/dev/null; then
-        echo "$file_to_track" >> $track_filepath
+    if ! grep $file_to_track $track_file_abs >/dev/null; then
+        echo "$file_to_track" >> $track_file_abs
     fi
 }
 
@@ -49,7 +49,7 @@ process_file() {
     local profile_name="$1"
     local relative_filepath="$2"
 
-    local absolute_source_path="$SCRIPT_DIR/$dotfiles_dir/$profile_name/$relative_filepath"
+    local absolute_source_path="$dotfiles_dir_abs/$profile_name/$relative_filepath"
     local target_filepath="$target_directory/.$relative_filepath"
     local target_dirname=`dirname $target_filepath`
 
@@ -196,6 +196,10 @@ helpmsg() {
 
 # -------
 
+if [ ! -d "$dfl_user_dir_abs" ]; then
+    mkdir -p "$dfl_user_dir_abs"
+fi
+
 command="$1"
 
 if [ "$command" = "-v" ]; then
@@ -208,6 +212,12 @@ fi
 if [ "$command" = "g" ] || [ "$command" = "git" ]; then
 
     shift
+    if [ ! -d $dotfiles_dir_abs ]; then
+        echo "I cannot find the dotfiles directory [$dotfiles_dir_abs]"
+        echo "You can clone your dotfiles repo with 'dfl clone'"
+        echo "or copy some dotfiles in [$dotfiles_dir_abs/default]"
+        exit 1
+    fi
     cd $dotfiles_dir_abs > /dev/null
     git $@
     cd - >/dev/null
@@ -233,7 +243,7 @@ elif [ "$command" = "clone" ]; then
         fi
         echo "done."
     fi
-    cd $SCRIPT_DIR >/dev/null
+    cd $dfl_user_dir_abs >/dev/null
     dotfiles_cloned_dir="dotfiles-cloned"
     git clone "$repo" $dotfiles_cloned_dir
     if [ $? -ne 0 ]; then
@@ -249,6 +259,12 @@ elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
 
     shift
     profile="$1"
+    if [ ! -d $dotfiles_dir_abs ]; then
+        echo "I cannot find the dotfiles directory [$dotfiles_dir_abs]"
+        echo "You can clone your dotfiles repo with 'dfl clone'"
+        echo "or copy some dotfiles in [$dotfiles_dir_abs/default]"
+        exit 1
+    fi
     cd $dotfiles_dir_abs > /dev/null
     test -d $default_profile_name && process_profile $default_profile_name
     test -d $secrets_profile_name && process_profile $secrets_profile_name
