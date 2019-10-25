@@ -93,5 +93,5 @@ Another way of doing this is:
 
 `dfl d` prints your dotfiles directory absolute path.
 
-Ok, it's not that awesome, but, hey, ¯\_(ツ)_/¯.
+Ok, it's not that awesome, but, hey, ¯\\_(ツ)_/¯.
 
