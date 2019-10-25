@@ -8,7 +8,6 @@
 # optionals:
 # - git
 
-
 # https://stackoverflow.com/a/246128/1407614
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -18,6 +17,8 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
+script_name="dfl"
+script_url="https://raw.githubusercontent.com/mapperr/dfl/master/dfl"
 
 dotfiles_dir="dotfiles"
 default_profile_name="default"
@@ -189,6 +190,9 @@ helpmsg() {
         d
             prints the dotfiles directory absolute path
 
+        u, up, update
+            self update from [$script_url]
+
     Options:
         -v  -  activate verbose mode
 "
@@ -273,6 +277,19 @@ elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
     fi
     cd - >/dev/null
     process_deleted_files $profile
+
+elif [ "$command" = "u" ] || [ "$command" = "up" ] || [ "$command" = "update" ]; then
+
+    script_path_abs="$SCRIPT_DIR/$script_name"
+    if hash curl; then
+        curl -o "$script_path_abs" "$script_url"
+        if [ $? -ne 0 ]; then
+            echo "ERROR: cannot update myself"
+            exit 1
+        fi
+    fi
+
+    echo "Updated"
 
 else
     helpmsg
