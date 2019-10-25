@@ -30,6 +30,8 @@ dotfiles_dir_abs="$SCRIPT_DIR/$dotfiles_dir"
 track_file_abs="$SCRIPT_DIR/$track_filename"
 untrack_file_abs="$SCRIPT_DIR/.untrack"
 
+backup_suffix="-dflbak"
+
 logd() {
     local msg="$1"
     test "$debug" = "true" && echo "$msg"
@@ -63,10 +65,10 @@ process_file() {
             rm -f $target_filepath
         else
             echo "WARNING: [$target_filepath] is present and is not a link"
-            echo -n "do you want to replace it with a link? (I'll backup it as [$target_filepath~]) (y/n) "
+            echo -n "do you want to replace it with a link? (I'll backup it as [$target_filepath$backup_suffix]) (y/n) "
             read c
             if [ "$c" = "y" ]; then
-                mv $target_filepath $target_filepath~
+                mv $target_filepath $target_filepath$backup_suffix
                 if [ ! $? = 0 ]; then
                     echo "ERROR: cannot backup [$target_filepath], I will not link it"
                     return
@@ -173,11 +175,22 @@ process_profile() {
 }
 
 helpmsg() {
-    echo "Usage: `basename $0` [-v] [link [profile_name] | git [git_arguments]]
+    echo "Usage: `basename $0` [-v] <command>
+    Commands:
+        l, link [profile_name]
+            links dotfiles in default, secrets and, eventually, profile_name directories, in this order
 
-    -v  -  activate verbose mode
-    link  -  links dotfiles in default, secrets and, eventually, profile_name directories, in this order
-    git [git_arguments]  -  runs git commands in the dotfiles directory
+        g, git [git_arguments]
+            runs git commands in the dotfiles directory
+
+        clone <git repository>
+            clone a git repo in the dotfile directory, backupping the eventual existing one
+
+        d
+            prints the dotfiles directory absolute path
+
+    Options:
+        -v  -  activate verbose mode
 "
 }
 
@@ -192,18 +205,51 @@ if [ "$command" = "-v" ]; then
 fi
 
 
-if [ "$command" = "git" ]; then
+if [ "$command" = "g" ] || [ "$command" = "git" ]; then
 
     shift
-    cd $SCRIPT_DIR/$dotfiles_dir > /dev/null
+    cd $dotfiles_dir_abs > /dev/null
     git $@
     cd - >/dev/null
 
-elif [ "$command" = "link" ]; then
+elif [ "$command" = "cd" ] || [ "$command" = "j" ]; then
+
+    cd "$dotfiles_dir_abs"
+
+elif [ "$command" = "d" ]; then
+
+    echo "$dotfiles_dir_abs"
+
+elif [ "$command" = "clone" ]; then
+
+    shift
+    repo="$1"
+    if [ -d "$dotfiles_dir_abs" ]; then
+        echo -n "Backupping dotfiles current dir... "
+        mv $dotfiles_dir_abs $dotfiles_dir_abs$backup_suffix
+        if [ $? -ne 0 ]; then
+            echo "ERROR: Cannot backup $directory_abs, aborting" >&2
+            exit 1
+        fi
+        echo "done."
+    fi
+    cd $SCRIPT_DIR >/dev/null
+    dotfiles_cloned_dir="dotfiles-cloned"
+    git clone "$repo" $dotfiles_cloned_dir
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Cannot clone repo [$repo], rollbacking" >&2
+        rm -rf $dotfiles_cloned_dir
+        mv $dotfiles_dir_abs$backup_suffix $dotfiles_dir_abs
+        exit 1
+    fi
+    mv $dotfiles_cloned_dir $dotfiles_dir
+    cd - >/dev/null
+
+elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
 
     shift
     profile="$1"
-    cd $SCRIPT_DIR/$dotfiles_dir > /dev/null
+    cd $dotfiles_dir_abs > /dev/null
     test -d $default_profile_name && process_profile $default_profile_name
     test -d $secrets_profile_name && process_profile $secrets_profile_name
     if [ ! -z "$profile" ]; then
