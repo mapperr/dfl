@@ -26,10 +26,6 @@ If the path does not exits it will mkdir it for you.
 
 If something that is not a link exists it will ask nicely what to do.
 
-The `dotfiles` directory is gitignored, so, if you didn't do that already, you can `git init` another repo in it.
-
-Or you can symlink your existing dotfiles folder as `/path/to/dfl/dotfiles`.
-
 
 ### Secrets
 
