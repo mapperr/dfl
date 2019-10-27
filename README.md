@@ -30,17 +30,20 @@ If something that is not a link exists it will ask nicely what to do.
 ### Secrets
 
 You can put your secret dotfiles in the `dotfiles/secrets` directory,
-they will be linked after the `default` ones, and, if `dotfiles` is a git repo, you can gitignore it.
+they will be linked after the `default` ones and the eventual override.
+
+It's a handy directory to gitignore, if your `dotfiles` is a git repo.
 
 
 ### Overrides
 
-If you need some 'overrides', put them in a new directory, e.g. `dotfiles/fluxbox`, and pass it to the script as an argument,
+If you need some 'overrides', put them in a new directory,
+e.g. `dotfiles/fluxbox`, and pass it to the script as an argument,
 like this:
 
 `dfl l fluxbox`
 
-It will link `default`, then `secrets` and then the `fluxbox` directory, overriding existing links.
+It will link `default`, then the `fluxbox` and then `secrets`, overriding existing links.
 
 This way of handle things is inspired by [bashdot](https://github.com/bashdot/bashdot) profiles.
 
@@ -50,7 +53,8 @@ that translates in you need some dotfiles to have different content than the usu
 
 ### Tracking
 
-`dfl` tracks the links it creates, so it deletes them if they are not presents in your `dotfiles` directory anymore.
+`dfl` tracks the links it creates,
+so it deletes them if they are not presents in your `dotfiles` directory anymore.
 
 It's clean, does not leave broken symlinks all around.
 

@@ -3,6 +3,7 @@
 # DotFiles Linker
 
 # requirements:
+# - bash, I guess
 # - readlink
 
 # optionals:
@@ -348,10 +349,10 @@ elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
     fi
     cd $dotfiles_dir_abs > /dev/null
     test -d $default_profile_name && process_profile $default_profile_name
-    test -d $secrets_profile_name && process_profile $secrets_profile_name
     if [ ! -z "$profile" ]; then
         test -d $profile && process_profile $profile
     fi
+    test -d $secrets_profile_name && process_profile $secrets_profile_name
     cd - >/dev/null
     process_deleted_files $profile
 
