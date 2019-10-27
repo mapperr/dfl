@@ -40,6 +40,56 @@ logd() {
     test "$debug" = "true" && echo "$msg"
 }
 
+take_file() {
+    local file="$1"
+    local profile="$2"
+
+    local current_dir_abs=`pwd`
+
+    if [ -z "$profile" ]; then
+        local profile="$default_profile_name"
+    fi
+
+    if [ -L "$file" ]; then
+        echo "[$file] is already a symlink, just take/move the original file" >&2
+        return 1
+    fi
+
+    if [ ! -f "$file" ] && [ ! -d "$file" ]; then
+        echo "[$file] is not a regular file/directory" >&2
+        return 1
+    fi
+
+    if echo "$file" | grep -e "^/" -e "^~/" >/dev/null; then
+        local filepath_abs="$file"
+    else
+        local filepath_abs="$current_dir_abs/$file"
+    fi
+
+    if ! echo "$filepath_abs" | grep "^$target_directory" >/dev/null; then
+        echo "ERROR: [$filepath_abs] is not in [$target_directory]"
+        return 1
+    fi
+
+    local target_relative_filepath=`echo "$filepath_abs" | sed "s#^$target_directory/##"`
+    logd "target-relative filepath: [$target_relative_filepath]"
+
+    if ! echo "$target_relative_filepath" | grep '^\.' >/dev/null; then
+        echo "ERROR: [$file] is not a dotfile nor in a dotdirectory"
+        return 1
+    fi
+
+    local target_relative_filepath_undotted=`echo "$target_relative_filepath" | sed 's#^\.##'`
+    local profile_filepath_abs="$dotfiles_dir_abs/$profile/$target_relative_filepath_undotted"
+
+    local profile_dir_path_abs=`dirname "$profile_filepath_abs"`
+
+    echo -n "taking [$filepath_abs] into $profile profile as [$target_relative_filepath_undotted]... "
+    test -d "$profile_dir_path_abs" || mkdir -p "$profile_dir_path_abs"
+    mv "$filepath_abs" "$profile_filepath_abs"
+    echo "done."
+}
+
 track_file() {
     local file_to_track="$1"
     if ! grep $file_to_track $track_file_abs >/dev/null; then
@@ -182,6 +232,9 @@ helpmsg() {
         l, link [profile_name]
             links dotfiles in default, secrets and, eventually, profile_name directories, in this order
 
+        t, take filename|dirname [profile_name]
+            move the file (or directory) into your dotfiles, in the specified profile directory, or in default if its omitted
+
         g, git [git_arguments]
             runs git commands in the dotfiles directory
 
@@ -259,6 +312,13 @@ elif [ "$command" = "clone" ]; then
     fi
     mv $dotfiles_cloned_dir $dotfiles_dir
     cd - >/dev/null
+
+elif [ "$command" = "t" ] || [ "$command" = "take" ]; then
+
+    shift
+    file="$1"
+    profile="$2"
+    take_file "$file" "$profile"
 
 elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
 
