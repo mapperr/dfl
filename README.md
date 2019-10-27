@@ -57,6 +57,24 @@ It's clean, does not leave broken symlinks all around.
 
 ## Utilities
 
+
+### Take
+
+Spotted a file that you shold move to your dotfiles?
+
+`dfl take .config/gopass/config.yml`
+
+it moves that file into your `default` profile, recreating the relative directory structure.
+
+It works with dotdirectories and you can specify an `override`, like:
+
+`dfl t .fluxbox fluxbox`
+
+It moves the `.fluxbox` directory into `<dotfiles_dir>/fluxbox/fluxbox`
+
+After that you only need to link them up with `dfl l`.
+
+
 ### Git
 
 If you have your dotfiles on some git repo you can do a `dfl clone <your repo>`.
