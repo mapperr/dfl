@@ -33,11 +33,27 @@ dotfiles_dir_abs="$dfl_user_dir_abs/$dotfiles_dir"
 track_file_abs="$dfl_user_dir_abs/$track_filename"
 untrack_file_abs="$dfl_user_dir_abs/.untrack"
 
+update_scriptpath_abs="$dfl_user_dir_name/update_dfl.sh"
 backup_suffix="-dflbak"
 
 logd() {
     local msg="$1"
     test "$debug" = "true" && echo "$msg"
+}
+
+write_update_script() {
+    cat > "$update_scriptpath_abs" << EOF
+#!/bin/bash
+script_path_abs="$SCRIPT_DIR/$script_name"
+if hash curl; then
+    curl -o "\$script_path_abs" "$script_url"
+    if [ \$? -ne 0 ]; then
+        echo "ERROR: cannot update myself"
+        exit 1
+    fi
+fi
+echo "Updated"
+EOF
 }
 
 take_file() {
@@ -341,16 +357,8 @@ elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
 
 elif [ "$command" = "u" ] || [ "$command" = "up" ] || [ "$command" = "update" ]; then
 
-    script_path_abs="$SCRIPT_DIR/$script_name"
-    if hash curl; then
-        curl -o "$script_path_abs" "$script_url"
-        if [ $? -ne 0 ]; then
-            echo "ERROR: cannot update myself"
-            exit 1
-        fi
-    fi
-
-    echo "Updated"
+    write_update_script
+    exec /bin/bash "$update_scriptpath_abs"
 
 else
     helpmsg
