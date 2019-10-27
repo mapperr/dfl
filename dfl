@@ -33,7 +33,7 @@ dotfiles_dir_abs="$dfl_user_dir_abs/$dotfiles_dir"
 track_file_abs="$dfl_user_dir_abs/$track_filename"
 untrack_file_abs="$dfl_user_dir_abs/.untrack"
 
-update_scriptpath_abs="$dfl_user_dir_name/update_dfl.sh"
+update_scriptpath_abs="$dfl_user_dir_abs/update_dfl.sh"
 backup_suffix="-dflbak"
 
 logd() {
