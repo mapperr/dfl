@@ -9,7 +9,7 @@ It, well, links your dotfiles to your HOME directory.
 
 ## Dotfiles
 
-Just clone this repo, `cd` in it and put your dotfiles in a `dotfiles/default` directory, without the dot.
+Just put the `dfl` scrpt in your `PATH`, and put your dotfiles in a `~/.dfl/dotfiles/default` directory, without the dot.
 
 Then run:
 
