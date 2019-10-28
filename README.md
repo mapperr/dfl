@@ -18,7 +18,7 @@ Then run:
 That's it.
 
 
-It works with dotdirectories:
+It also works with files in dotdirectories:
 
 `dotfiles/default/.config/rofi/config.rasi` will be linked to `$HOME/.config/rasi/config.rasi`
 
