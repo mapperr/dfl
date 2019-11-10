@@ -37,6 +37,9 @@ untrack_file_abs="$dfl_user_dir_abs/.untrack"
 update_scriptpath_abs="$dfl_user_dir_abs/update_dfl.sh"
 backup_suffix="-dflbak"
 
+environment_hostname=`hostname`
+environment_override="$DFL_OVERRIDE"
+
 logd() {
     local msg="$1"
     test "$debug" = "true" && echo "$msg"
@@ -349,8 +352,14 @@ elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
     fi
     cd $dotfiles_dir_abs > /dev/null
     test -d $default_profile_name && process_profile $default_profile_name
-    if [ ! -z "$profile" ]; then
-        test -d $profile && process_profile $profile
+    if [ -d "$profile" ]; then
+        process_profile "$profile"
+    else
+        if [ -d "$environment_override" ]; then
+            process_profile "$environment_override"
+        elif [ -d "$environment_hostname" ]; then
+            process_profile "$environment_hostname"
+        fi
     fi
     test -d $secrets_profile_name && process_profile $secrets_profile_name
     cd - >/dev/null
