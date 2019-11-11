@@ -248,27 +248,36 @@ process_profile() {
 
 helpmsg() {
     echo "Usage: `basename $0` [-v] <command>
-    Commands:
-        l, link [profile_name]
-            links dotfiles in default, secrets and, eventually, profile_name directories, in this order
+Commands:
+    l, link [profile_name]
+        links dotfiles in default, secrets and, eventually,
+        profile_name directories, in this order
 
-        t, take filename|dirname [profile_name]
-            move the file (or directory) into your dotfiles, in the specified profile directory, or in default if its omitted
+    t, take filename|dirname [profile_name]
+        move the file (or directory) into your dotfiles,
+        in the specified profile directory, or in default if its omitted
 
-        g, git [git_arguments]
-            runs git commands in the dotfiles directory
+    g, git [git_arguments]
+        runs git commands in the dotfiles directory
 
-        clone <git repository>
-            clone a git repo in the dotfile directory, backupping the eventual existing one
+    clone <git repository>
+        clone a git repo in the dotfile directory,
+        backupping the eventual existing one
 
-        d
-            prints the dotfiles directory absolute path
+    d
+        prints the dotfiles directory absolute path
 
-        u, up, update
-            self update from [$script_url]
+    u, up, update
+        self update from [$script_url]
 
-    Options:
-        -v  -  activate verbose mode
+Options:
+    -v  -  activate verbose mode
+
+Auto profile:
+    you can make dfl choose a profile automatically so that you don't have
+    to remember to type it if you set the env var DFL_OVERRIDE.
+    If dfl does not find that var, it checks if there is a profile dir named
+    as the output of the hostname command and take that as the profile.
 "
 }
 

@@ -37,6 +37,8 @@ It's a handy directory to gitignore, if your `dotfiles` is a git repo.
 
 ### Overrides
 
+Or 'profiles' if it suits you better.
+
 If you need some 'overrides', put them in a new directory,
 e.g. `dotfiles/fluxbox`, and pass it to the script as an argument,
 like this:
@@ -49,6 +51,14 @@ This way of handle things is inspired by [bashdot](https://github.com/bashdot/ba
 
 A use case is when you have another pc/server and you need a slightly different configuration,
 that translates in you need some dotfiles to have different content than the usual.
+
+
+### Auto override
+
+You can make dfl choose a profile automatically so that you don't have
+to remember to type it if you set the env var `DFL_OVERRIDE`.
+If `dfl` does not find that var, it checks if there is a profile dir named
+as the output of the hostname command and take that as the profile.
 
 
 ### Tracking
@@ -84,14 +94,14 @@ After that you only need to link them up with `dfl l`.
 If you have your dotfiles on some git repo you can do a `dfl clone <your repo>`.
 It will clone you repo in the `dotfiles` dir, backupping the existing one.
 
-If you cloned your repo, moved from another directory or just `git init` it
-you can commit and push your dotfiles directly with `dfl`:
+So, if your dotfiles dir is a git repo you can commit and push your dotfiles
+directly with `dfl`:
 
 `dfl git <whatever git command and arguments>`
 
-it `cd` in your `dotfiles` directory and execute the `git` part.
+it `cd`s in your `dotfiles` directory and executes the `git` part.
 
-So you can hack your `~/.vimrc` and do:
+For example, you can hack your `~/.vimrc` and do:
 
 `dfl g commit -am 'Add awesomeness' && dfl g push`
 
