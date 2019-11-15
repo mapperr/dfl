@@ -366,8 +366,10 @@ elif [ "$command" = "l" ] || [ "$command" = "link" ]; then
     else
         if [ -d "$environment_override" ]; then
             process_profile "$environment_override"
+            profile="$environment_override"
         elif [ -d "$environment_hostname" ]; then
             process_profile "$environment_hostname"
+            profile="$environment_hostname"
         fi
     fi
     test -d $secrets_profile_name && process_profile $secrets_profile_name
