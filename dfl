@@ -154,10 +154,9 @@ process_file() {
         logd "[$target_filepath] does not exists, I will link it"
     fi
 
-    echo -n "linking [$absolute_source_path] to [$target_filepath]... "
+    logd "linking [$absolute_source_path] to [$target_filepath]."
     ln -s $absolute_source_path $target_filepath
     track_file $target_filepath
-    echo "done."
 }
 
 process_deleted_files() {
